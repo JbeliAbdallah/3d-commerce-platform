@@ -13,12 +13,13 @@ type ProductFormProps = {
   categories: Category[];
   action: (formData: FormData) => void | Promise<void>;
   defaultValues?: ProductFormData;
+  mode?: "create" | "edit";
 };
-
 export default function ProductForm({
   categories,
   action,
   defaultValues,
+  mode = "create",
 }: ProductFormProps) {
   const {
     register,
@@ -226,7 +227,11 @@ export default function ProductForm({
           disabled={isSubmitting}
           className="rounded-xl bg-brand-brown px-7 py-3.5 text-sm font-bold text-brand-cream transition-all hover:-translate-y-0.5 hover:bg-brand-orange disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? "Enregistrement..." : "Créer le produit"}
+          {isSubmitting
+            ? "Enregistrement..."
+            : mode === "edit"
+              ? "Enregistrer les modifications"
+              : "Créer le produit"}
         </button>
       </div>
     </form>

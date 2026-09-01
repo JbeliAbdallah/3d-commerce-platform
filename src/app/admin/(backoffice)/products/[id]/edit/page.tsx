@@ -88,6 +88,7 @@ export default async function EditProductPage({
         <ProductForm
           categories={categoryOptions}
           action={action}
+          mode="edit"
           defaultValues={{
             slug: product.slug,
             price: Number(product.price),
