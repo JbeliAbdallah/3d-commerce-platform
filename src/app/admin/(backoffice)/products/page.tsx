@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { prisma } from "@/lib/db/prisma";
+import ArchiveProductButton from "@/components/products/ArchiveProductButton";
+import { archiveProductAction } from "./archive-action";
 
 export default async function ProductsPage() {
   const products = await prisma.product.findMany({
@@ -87,6 +89,12 @@ export default async function ProductsPage() {
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-brand-brown/50">
                     Statut
                   </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-brand-brown/50">
+                    Mis en avant
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-brand-brown/50">
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
@@ -136,9 +144,43 @@ export default async function ProductsPage() {
                       </td>
 
                       <td className="px-6 py-5">
-                        <span className="rounded-full bg-brand-teal/10 px-3 py-1 text-xs font-bold text-brand-teal">
-                          {product.status}
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-bold ${
+                            product.status === "ACTIVE"
+                              ? "bg-brand-teal/10 text-brand-teal"
+                              : product.status === "DRAFT"
+                                ? "bg-brand-orange/10 text-brand-orange"
+                                : "bg-brand-brown/10 text-brand-brown/50"
+                          }`}
+                        >
+                          {product.status === "ACTIVE"
+                            ? "Actif"
+                            : product.status === "DRAFT"
+                              ? "Brouillon"
+                              : "Archivé"}
                         </span>
+                      </td>
+                      <td className="px-6 py-5">
+                        {product.featured ? (
+                          <span className="rounded-full bg-brand-orange/10 px-3 py-1 text-xs font-bold text-brand-orange">
+                            Oui
+                          </span>
+                        ) : (
+                          <span className="text-sm text-brand-brown/35">
+                            Non
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="px-6 py-5">
+                        {product.status !== "ARCHIVED" ? (
+                          <ArchiveProductButton
+                            productId={product.id}
+                            action={archiveProductAction}
+                          />
+                        ) : (
+                          <span className="text-sm text-brand-brown/30">—</span>
+                        )}
                       </td>
                     </tr>
                   );
