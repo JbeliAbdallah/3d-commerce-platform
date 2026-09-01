@@ -8,6 +8,7 @@ import {
 } from "@/lib/validations/category";
 
 type CategoryFormProps = {
+  mode?: "create" | "edit";
   action: (formData: FormData) => void | Promise<void>;
   defaultValues?: CategoryFormData;
 };
@@ -15,6 +16,7 @@ type CategoryFormProps = {
 export default function CategoryForm({
   action,
   defaultValues,
+  mode = "create",
 }: CategoryFormProps) {
   const {
     register,
@@ -143,7 +145,11 @@ export default function CategoryForm({
           disabled={isSubmitting}
           className="rounded-xl bg-brand-brown px-7 py-3.5 text-sm font-bold text-brand-cream transition-all hover:-translate-y-0.5 hover:bg-brand-orange disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? "Enregistrement..." : "Créer la catégorie"}
+          {isSubmitting
+            ? "Enregistrement..."
+            : mode === "edit"
+              ? "Enregistrer les modifications"
+              : "Créer la catégorie"}
         </button>
       </div>
     </form>
