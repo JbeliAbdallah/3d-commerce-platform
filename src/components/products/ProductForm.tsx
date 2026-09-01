@@ -12,16 +12,21 @@ type Category = {
 type ProductFormProps = {
   categories: Category[];
   action: (formData: FormData) => void | Promise<void>;
+  defaultValues?: ProductFormData;
 };
 
-export default function ProductForm({ categories, action }: ProductFormProps) {
+export default function ProductForm({
+  categories,
+  action,
+  defaultValues,
+}: ProductFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
+    defaultValues: defaultValues ?? {
       slug: "",
       price: 0,
       stock: 0,
