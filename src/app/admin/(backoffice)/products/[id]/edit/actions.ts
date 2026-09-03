@@ -22,6 +22,7 @@ export async function updateProductAction(
     categoryId: formData.get("categoryId") || undefined,
     status: formData.get("status"),
     featured: formData.get("featured") === "true",
+    imageUrl: formData.get("imageUrl") || undefined,
 
     translations: {
       fr: {
@@ -40,6 +41,14 @@ export async function updateProductAction(
 
   const existingProduct = await prisma.product.findUnique({
     where: { id: productId },
+    include: {
+      images: {
+        orderBy: {
+          sortOrder: "asc",
+        },
+        take: 1,
+      },
+    },
   });
 
   if (!existingProduct) {
@@ -97,6 +106,27 @@ export async function updateProductAction(
         description: data.translations.fr.description || null,
       },
     });
+
+    if (data.imageUrl) {
+      if (existingProduct.images[0]) {
+        await tx.productImage.update({
+          where: {
+            id: existingProduct.images[0].id,
+          },
+          data: {
+            url: data.imageUrl,
+          },
+        });
+      } else {
+        await tx.productImage.create({
+          data: {
+            productId,
+            url: data.imageUrl,
+            sortOrder: 0,
+          },
+        });
+      }
+    }
   });
 
   redirect("/admin/products");

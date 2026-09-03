@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import ImageUploader from "@/components/uploads/ImageUploader";
 import {
   categorySchema,
   type CategoryFormData,
@@ -18,6 +20,8 @@ export default function CategoryForm({
   defaultValues,
   mode = "create",
 }: CategoryFormProps) {
+  const [imageUrl, setImageUrl] = useState(defaultValues?.imageUrl ?? "");
+
   const {
     register,
     handleSubmit,
@@ -41,6 +45,7 @@ export default function CategoryForm({
     formData.set("description", data.description ?? "");
     formData.set("sortOrder", String(data.sortOrder));
     formData.set("isActive", String(data.isActive));
+    formData.set("imageUrl", imageUrl);
 
     return action(formData);
   };
@@ -127,15 +132,12 @@ export default function CategoryForm({
           </h2>
 
           <p className="mt-2 text-sm text-brand-brown/50">
-            L&apos;upload Cloudinary sera connecté lorsque le compte du client
-            sera disponible.
+            Ajoutez une image pour cette catégorie.
           </p>
         </div>
 
-        <div className="mt-6 flex min-h-32 items-center justify-center rounded-xl border-2 border-dashed border-brand-brown/10 bg-brand-cream">
-          <p className="text-sm font-semibold text-brand-brown/40">
-            Upload d&apos;image — bientôt disponible
-          </p>
+        <div className="mt-6">
+          <ImageUploader value={imageUrl} onChange={setImageUrl} />
         </div>
       </section>
 

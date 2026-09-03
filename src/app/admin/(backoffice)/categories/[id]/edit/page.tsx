@@ -71,6 +71,7 @@ export default async function EditCategoryPage({
             description: translation?.description ?? "",
             sortOrder: category.sortOrder,
             isActive: category.isActive,
+            imageUrl: category.image ?? "",
           }}
         />
       </div>

@@ -23,6 +23,7 @@ export const productSchema = z.object({
   status: z.enum(["DRAFT", "ACTIVE", "ARCHIVED"]),
 
   featured: z.boolean(),
+  imageUrl: z.string().url("URL d'image invalide.").optional(),
 
   translations: z.object({
     fr: z.object({

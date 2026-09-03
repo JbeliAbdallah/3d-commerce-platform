@@ -25,6 +25,10 @@ export const categorySchema = z.object({
     .min(0, "L'ordre ne peut pas être négatif."),
 
   isActive: z.boolean(),
+
+  imageUrl: z
+    .union([z.string().url("URL d'image invalide."), z.literal("")])
+    .optional(),
 });
 
 export type CategoryFormData = z.infer<typeof categorySchema>;

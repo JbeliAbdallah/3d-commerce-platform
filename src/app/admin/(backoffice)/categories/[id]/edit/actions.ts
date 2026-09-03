@@ -21,6 +21,7 @@ export async function updateCategoryAction(
     description: formData.get("description") || undefined,
     sortOrder: Number(formData.get("sortOrder")),
     isActive: formData.get("isActive") === "true",
+    imageUrl: formData.get("imageUrl") || undefined,
   });
 
   if (!result.success) {
@@ -67,6 +68,7 @@ export async function updateCategoryAction(
         slug: data.slug,
         sortOrder: data.sortOrder,
         isActive: data.isActive,
+        image: data.imageUrl || null,
       },
     });
 

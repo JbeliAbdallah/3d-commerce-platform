@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema, type ProductFormData } from "@/lib/validations/product";
+import ImageUploader from "@/components/uploads/ImageUploader";
 
 type Category = {
   id: string;
@@ -21,6 +23,8 @@ export default function ProductForm({
   defaultValues,
   mode = "create",
 }: ProductFormProps) {
+  const [imageUrl, setImageUrl] = useState(defaultValues?.imageUrl ?? "");
+
   const {
     register,
     handleSubmit,
@@ -53,6 +57,7 @@ export default function ProductForm({
     formData.set("categoryId", data.categoryId ?? "");
     formData.set("status", data.status);
     formData.set("featured", String(data.featured));
+    formData.set("imageUrl", imageUrl);
 
     formData.set("frName", data.translations.fr.name);
     formData.set("frShortDesc", data.translations.fr.shortDesc);
@@ -209,15 +214,12 @@ export default function ProductForm({
           </h2>
 
           <p className="mt-2 text-sm text-brand-brown/50">
-            L&apos;upload Cloudinary sera connecté ici lorsque le compte du
-            client sera disponible.
+            Ajoutez une image principale pour ce produit.
           </p>
         </div>
 
-        <div className="mt-6 flex min-h-32 items-center justify-center rounded-xl border-2 border-dashed border-brand-brown/10 bg-brand-cream">
-          <p className="text-sm font-semibold text-brand-brown/40">
-            Upload d&apos;images — bientôt disponible
-          </p>
+        <div className="mt-6">
+          <ImageUploader value={imageUrl} onChange={setImageUrl} />
         </div>
       </section>
 

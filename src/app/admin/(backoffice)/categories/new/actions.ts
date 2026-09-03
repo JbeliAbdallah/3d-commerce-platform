@@ -18,6 +18,7 @@ export async function createCategoryAction(formData: FormData) {
     description: formData.get("description") || undefined,
     sortOrder: Number(formData.get("sortOrder")),
     isActive: formData.get("isActive") === "true",
+    imageUrl: formData.get("imageUrl") || undefined,
   });
 
   if (!result.success) {
@@ -44,6 +45,7 @@ export async function createCategoryAction(formData: FormData) {
       slug: data.slug,
       sortOrder: data.sortOrder,
       isActive: data.isActive,
+      image: data.imageUrl || null,
 
       translations: {
         create: {

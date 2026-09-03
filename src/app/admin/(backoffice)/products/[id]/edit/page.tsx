@@ -27,6 +27,12 @@ export default async function EditProductPage({
             language: "fr",
           },
         },
+        images: {
+          orderBy: {
+            sortOrder: "asc",
+          },
+          take: 1,
+        },
       },
     }),
 
@@ -96,6 +102,7 @@ export default async function EditProductPage({
             categoryId: product.categoryId ?? "",
             status: product.status,
             featured: product.featured,
+            imageUrl: product.images[0]?.url,
             translations: {
               fr: {
                 name: translation?.name ?? "",

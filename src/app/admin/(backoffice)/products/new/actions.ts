@@ -19,6 +19,7 @@ export async function createProductAction(formData: FormData) {
     categoryId: formData.get("categoryId") || undefined,
     status: formData.get("status"),
     featured: formData.get("featured") === "true",
+    imageUrl: formData.get("imageUrl") || undefined,
 
     translations: {
       fr: {
@@ -52,6 +53,15 @@ export async function createProductAction(formData: FormData) {
           description: data.translations.fr.description || null,
         },
       },
+
+      images: data.imageUrl
+        ? {
+            create: {
+              url: data.imageUrl,
+              sortOrder: 0,
+            },
+          }
+        : undefined,
     },
   });
 
