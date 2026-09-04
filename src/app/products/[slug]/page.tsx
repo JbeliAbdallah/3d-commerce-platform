@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+
 import { notFound } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -147,15 +148,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </p>
               </div>
 
-              <a
-                href="https://wa.me/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-8 inline-flex w-fit items-center gap-3 rounded-full bg-brand-brown px-7 py-4 text-sm font-bold text-brand-cream transition-all hover:-translate-y-1 hover:bg-brand-orange hover:shadow-lg"
+              <Link
+                href={`/products/${product.slug}/order`}
+                className="inline-flex items-center justify-center rounded-full bg-brand-orange px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-orange/90"
               >
-                <MessageCircle size={19} />
-                Commander via WhatsApp
-              </a>
+                Commander
+              </Link>
 
               <p className="mt-4 text-xs leading-5 text-brand-brown/45">
                 Contactez-nous pour confirmer la disponibilité et les détails de
