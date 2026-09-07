@@ -1,9 +1,17 @@
 import Link from "next/link";
-import { ArrowLeft, Phone, MapPin, Mail, MessageCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Phone,
+  MapPin,
+  Mail,
+  MessageCircle,
+  FileText,
+} from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/auth/session";
 import { updateOrderStatusAction } from "./actions";
+import { createInvoiceAction } from "../[id]/invoice/actions";
 
 const statusLabels: Record<string, string> = {
   PENDING: "En attente",
@@ -77,26 +85,38 @@ export default async function OrderDetailPage({
           </p>
         </div>
 
-        <form action={updateOrderStatusAction.bind(null, order.id)}>
-          <select
-            name="status"
-            defaultValue={order.status}
-            className="rounded-xl border border-brand-brown/10 bg-white px-4 py-3 text-sm font-semibold text-brand-brown outline-none focus:border-brand-orange"
-          >
-            {Object.entries(statusLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-wrap gap-2">
+          <form action={updateOrderStatusAction.bind(null, order.id)}>
+            <select
+              name="status"
+              defaultValue={order.status}
+              className="rounded-xl border border-brand-brown/10 bg-white px-4 py-3 text-sm font-semibold text-brand-brown outline-none focus:border-brand-orange"
+            >
+              {Object.entries(statusLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
 
-          <button
-            type="submit"
-            className="ml-2 rounded-xl bg-brand-orange px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-orange/90"
-          >
-            Mettre à jour
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="ml-2 rounded-xl bg-brand-orange px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-orange/90"
+            >
+              Mettre à jour
+            </button>
+          </form>
+
+          <form action={createInvoiceAction.bind(null, order.id)}>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-brown px-4 py-3 text-sm font-semibold text-brand-cream transition hover:bg-brand-brown/90"
+            >
+              <FileText size={18} />
+              Générer la facture
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
