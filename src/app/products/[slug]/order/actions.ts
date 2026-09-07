@@ -67,15 +67,23 @@ export async function createOrderAction(
       throw new Error("Stock insuffisant pour cette quantité.");
     }
 
-    const customer = await tx.customer.create({
-      data: {
-        name: data.customerName,
+    const existingCustomer = await tx.customer.findFirst({
+      where: {
         phone: data.phone,
-        email: data.email || null,
-        address: data.address || null,
-        city: data.city || null,
       },
     });
+
+    const customer =
+      existingCustomer ??
+      (await tx.customer.create({
+        data: {
+          name: data.customerName,
+          phone: data.phone,
+          email: data.email || null,
+          address: data.address || null,
+          city: data.city || null,
+        },
+      }));
 
     return tx.order.create({
       data: {
