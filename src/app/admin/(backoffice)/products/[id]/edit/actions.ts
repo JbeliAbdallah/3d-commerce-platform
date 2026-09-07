@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 
 export async function updateProductAction(
   productId: string,
+  returnTo: string,
   formData: FormData,
 ) {
   const user = await getCurrentUser();
@@ -129,5 +130,5 @@ export async function updateProductAction(
     }
   });
 
-  redirect("/admin/products");
+  redirect(returnTo);
 }

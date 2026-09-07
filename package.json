@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "check": "tsc --noEmit && npm run lint",
+    "postinstall": "prisma generate",
+    "typecheck:watch": "tsc --noEmit --watch",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -36,6 +39,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
+    "husky": "^9.1.7",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
     "typescript": "^5"

@@ -9,6 +9,7 @@ import {
   FolderOpen,
   LogOut,
   Menu,
+  Package,
   ShoppingBag,
   Users,
   X,
@@ -35,6 +36,11 @@ const navigation = [
     label: "Commandes",
     href: "/admin/orders",
     icon: Boxes,
+  },
+  {
+    label: "Stock",
+    href: "/admin/inventory",
+    icon: Package,
   },
   {
     label: "Clients",

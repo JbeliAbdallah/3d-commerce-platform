@@ -88,14 +88,20 @@ export default function OrderForm({ action, maxQuantity }: OrderFormProps) {
             placeholder="Tunis"
           />
 
-          <Field
-            label="Quantité *"
-            error={errors.quantity?.message}
-            {...register("quantity", { valueAsNumber: true })}
-            type="number"
-            min="1"
-            max={maxQuantity}
-          />
+          <div>
+            <Field
+              label="Quantité *"
+              error={errors.quantity?.message}
+              {...register("quantity", { valueAsNumber: true })}
+              type="number"
+              min="1"
+              max={maxQuantity}
+            />
+
+            <p className="mt-1.5 text-xs font-semibold text-brand-brown/45">
+              Stock disponible : {maxQuantity} unité{maxQuantity > 1 ? "s" : ""}
+            </p>
+          </div>
         </div>
 
         <div>

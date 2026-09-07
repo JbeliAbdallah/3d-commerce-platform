@@ -9,12 +9,20 @@ type EditProductPageProps = {
   params: Promise<{
     id: string;
   }>;
+  searchParams: Promise<{
+    returnTo?: string;
+  }>;
 };
 
 export default async function EditProductPage({
   params,
+  searchParams,
 }: EditProductPageProps) {
   const { id } = await params;
+  const { returnTo } = await searchParams;
+
+  const safeReturnTo =
+    returnTo === "/admin/inventory" ? "/admin/inventory" : "/admin/products";
 
   const [product, categories] = await Promise.all([
     prisma.product.findUnique({
@@ -64,12 +72,11 @@ export default async function EditProductPage({
     name: category.translations[0]?.name ?? category.slug,
   }));
 
-  const action = updateProductAction.bind(null, product.id);
-
+  const action = updateProductAction.bind(null, product.id, safeReturnTo);
   return (
     <div>
       <Link
-        href="/admin/products"
+        href={safeReturnTo}
         className="inline-flex items-center gap-2 text-sm font-semibold text-brand-brown/55 transition-colors hover:text-brand-orange"
       >
         <ArrowLeft size={16} />

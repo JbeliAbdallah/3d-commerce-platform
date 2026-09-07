@@ -47,32 +47,53 @@ export async function createOrderAction(
 
   const total = product.price.mul(data.quantity);
 
-  const customer = await prisma.customer.create({
-    data: {
-      name: data.customerName,
-      phone: data.phone,
-      email: data.email || null,
-      address: data.address || null,
-      city: data.city || null,
-    },
-  });
-
-  const order = await prisma.order.create({
-    data: {
-      customerId: customer.id,
-      status: "PENDING",
-      total,
-      customerNotes: data.customerNotes || null,
-      whatsappContact: false,
-
-      items: {
-        create: {
-          productId: product.id,
-          quantity: data.quantity,
-          unitPrice: product.price,
+  const order = await prisma.$transaction(async (tx) => {
+    const updatedProduct = await tx.product.updateMany({
+      where: {
+        id: product.id,
+        status: "ACTIVE",
+        stock: {
+          gte: data.quantity,
         },
       },
-    },
+      data: {
+        stock: {
+          decrement: data.quantity,
+        },
+      },
+    });
+
+    if (updatedProduct.count !== 1) {
+      throw new Error("Stock insuffisant pour cette quantité.");
+    }
+
+    const customer = await tx.customer.create({
+      data: {
+        name: data.customerName,
+        phone: data.phone,
+        email: data.email || null,
+        address: data.address || null,
+        city: data.city || null,
+      },
+    });
+
+    return tx.order.create({
+      data: {
+        customerId: customer.id,
+        status: "PENDING",
+        total,
+        customerNotes: data.customerNotes || null,
+        whatsappContact: false,
+
+        items: {
+          create: {
+            productId: product.id,
+            quantity: data.quantity,
+            unitPrice: product.price,
+          },
+        },
+      },
+    });
   });
 
   redirect(`/products/${slug}/order/success?order=${order.id}`);
