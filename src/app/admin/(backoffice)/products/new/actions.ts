@@ -36,7 +36,7 @@ export async function createProductAction(formData: FormData) {
 
   const data = result.data;
 
-  const product = await prisma.product.create({
+  await prisma.product.create({
     data: {
       slug: data.slug,
       price: data.price,
@@ -65,5 +65,5 @@ export async function createProductAction(formData: FormData) {
     },
   });
 
-  redirect(`/admin/products/${product.id}/edit`);
+  redirect("/admin/products?success=created");
 }

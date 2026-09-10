@@ -2,7 +2,17 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { prisma } from "@/lib/db/prisma";
 
-export default async function CategoriesPage() {
+type CategoriesPageProps = {
+  searchParams: Promise<{
+    success?: string;
+  }>;
+};
+
+export default async function CategoriesPage({
+  searchParams,
+}: CategoriesPageProps) {
+  const { success } = await searchParams;
+
   const categories = await prisma.category.findMany({
     include: {
       translations: {
@@ -51,6 +61,12 @@ export default async function CategoriesPage() {
           Ajouter une catégorie
         </Link>
       </div>
+
+      {success === "created" && (
+        <div className="mt-6 rounded-xl border border-brand-teal/20 bg-brand-teal/10 px-4 py-3 text-sm font-semibold text-brand-teal">
+          ✓ Catégorie créée avec succès.
+        </div>
+      )}
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-brand-brown/10 bg-brand-surface">
         {categories.length === 0 ? (

@@ -23,10 +23,14 @@ const statusLabels: Record<string, string> = {
 
 type OrderDetailPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{
+    success?: string;
+  }>;
 };
 
 export default async function OrderDetailPage({
   params,
+  searchParams,
 }: OrderDetailPageProps) {
   const user = await getCurrentUser();
 
@@ -35,6 +39,7 @@ export default async function OrderDetailPage({
   }
 
   const { id } = await params;
+  const { success } = await searchParams;
 
   const order = await prisma.order.findUnique({
     where: { id },
@@ -62,6 +67,11 @@ export default async function OrderDetailPage({
 
   return (
     <div className="space-y-8">
+      {success === "status-updated" && (
+        <div className="rounded-xl border border-brand-teal/20 bg-brand-teal/10 px-4 py-3 text-sm font-semibold text-brand-teal">
+          ✓ Statut de la commande mis à jour.
+        </div>
+      )}
       <Link
         href="/admin/orders"
         className="inline-flex items-center gap-2 text-sm font-semibold text-brand-brown/60 transition hover:text-brand-orange"

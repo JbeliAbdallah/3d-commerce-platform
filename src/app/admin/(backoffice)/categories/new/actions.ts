@@ -40,7 +40,7 @@ export async function createCategoryAction(formData: FormData) {
     throw new Error("Ce slug est déjà utilisé.");
   }
 
-  const category = await prisma.category.create({
+  await prisma.category.create({
     data: {
       slug: data.slug,
       sortOrder: data.sortOrder,
@@ -57,5 +57,5 @@ export async function createCategoryAction(formData: FormData) {
     },
   });
 
-  redirect(`/admin/categories/${category.id}/edit`);
+  redirect("/admin/categories?success=created");
 }

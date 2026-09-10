@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema, type ProductFormData } from "@/lib/validations/product";
 import ImageUploader from "@/components/uploads/ImageUploader";
@@ -17,6 +17,16 @@ type ProductFormProps = {
   defaultValues?: ProductFormData;
   mode?: "create" | "edit";
 };
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function ProductForm({
   categories,
   action,
@@ -25,9 +35,13 @@ export default function ProductForm({
 }: ProductFormProps) {
   const [imageUrl, setImageUrl] = useState(defaultValues?.imageUrl ?? "");
 
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(mode === "edit");
+
   const {
     register,
     handleSubmit,
+    setValue,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -48,6 +62,19 @@ export default function ProductForm({
     },
   });
 
+  const productName = useWatch({
+    control,
+    name: "translations.fr.name",
+  });
+
+  useEffect(() => {
+    if (mode === "create" && !slugManuallyEdited) {
+      setValue("slug", slugify(productName ?? ""), {
+        shouldValidate: true,
+      });
+    }
+  }, [productName, mode, slugManuallyEdited, setValue]);
+
   const onSubmit = (data: ProductFormData) => {
     const formData = new FormData();
 
@@ -66,79 +93,104 @@ export default function ProductForm({
     return action(formData);
   };
 
+  const slugField = register("slug");
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <section className="rounded-[1.5rem] border border-brand-brown/10 bg-brand-surface p-6 sm:p-8">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-orange">
-            Informations
+            Catalogue
           </p>
 
           <h2 className="mt-2 text-xl font-extrabold text-brand-brown">
-            Produit
+            Informations du produit
           </h2>
+
+          <p className="mt-2 text-sm text-brand-brown/50">
+            Renseignez les informations principales du produit.
+          </p>
         </div>
 
-        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        <div className="mt-6 space-y-5">
           <Field
-            label="Slug"
-            error={errors.slug?.message}
-            {...register("slug")}
-            placeholder="lampe-lune-3d"
+            label="Nom du produit *"
+            error={errors.translations?.fr?.name?.message}
+            {...register("translations.fr.name")}
+            placeholder="Lampe Luna 3D"
           />
 
           <div>
-            <label className="mb-2 block text-sm font-bold text-brand-brown">
-              Catégorie
-            </label>
+            <Field
+              label="Slug *"
+              error={errors.slug?.message}
+              {...slugField}
+              onChange={(event) => {
+                setSlugManuallyEdited(true);
+                slugField.onChange(event);
+              }}
+              placeholder="lampe-luna-3d"
+            />
 
-            <select
-              {...register("categoryId")}
-              className="w-full rounded-xl border border-brand-brown/15 bg-brand-cream px-4 py-3 text-sm text-brand-brown outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20"
-            >
-              <option value="">Sans catégorie</option>
-
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+            <p className="mt-1.5 text-xs text-brand-brown/45">
+              Utilisé dans l’URL du produit.
+            </p>
           </div>
 
-          <Field
-            label="Prix (DT)"
-            type="number"
-            step="0.01"
-            min="0"
-            error={errors.price?.message}
-            {...register("price", { valueAsNumber: true })}
-          />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-bold text-brand-brown">
+                Catégorie
+              </label>
 
-          <Field
-            label="Stock"
-            type="number"
-            min="0"
-            error={errors.stock?.message}
-            {...register("stock", { valueAsNumber: true })}
-          />
+              <select
+                {...register("categoryId")}
+                className="w-full rounded-xl border border-brand-brown/15 bg-brand-cream px-4 py-3 text-sm text-brand-brown outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20"
+              >
+                <option value="">Sans catégorie</option>
 
-          <div>
-            <label className="mb-2 block text-sm font-bold text-brand-brown">
-              Statut
-            </label>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              {...register("status")}
-              className="w-full rounded-xl border border-brand-brown/15 bg-brand-cream px-4 py-3 text-sm text-brand-brown outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20"
-            >
-              <option value="DRAFT">Brouillon</option>
-              <option value="ACTIVE">Actif</option>
-              <option value="ARCHIVED">Archivé</option>
-            </select>
+            <Field
+              label="Prix (DT)"
+              type="number"
+              step="0.01"
+              min="0"
+              error={errors.price?.message}
+              {...register("price", { valueAsNumber: true })}
+            />
+
+            <Field
+              label="Stock"
+              type="number"
+              min="0"
+              error={errors.stock?.message}
+              {...register("stock", { valueAsNumber: true })}
+            />
+
+            <div>
+              <label className="mb-2 block text-sm font-bold text-brand-brown">
+                Statut
+              </label>
+
+              <select
+                {...register("status")}
+                className="w-full rounded-xl border border-brand-brown/15 bg-brand-cream px-4 py-3 text-sm text-brand-brown outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20"
+              >
+                <option value="DRAFT">Brouillon</option>
+                <option value="ACTIVE">Actif</option>
+                <option value="ARCHIVED">Archivé</option>
+              </select>
+            </div>
           </div>
 
-          <label className="flex items-center gap-3 self-end rounded-xl border border-brand-brown/10 bg-brand-cream px-4 py-3">
+          <label className="flex items-center gap-3 rounded-xl border border-brand-brown/10 bg-brand-cream px-4 py-3">
             <input
               type="checkbox"
               {...register("featured")}
@@ -149,38 +201,19 @@ export default function ProductForm({
               Produit mis en avant
             </span>
           </label>
-        </div>
-      </section>
 
-      <section className="rounded-[1.5rem] border border-brand-brown/10 bg-brand-surface p-6 sm:p-8">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-orange">
-            Contenu
-          </p>
+          <div>
+            <label className="mb-2 block text-sm font-bold text-brand-brown">
+              Description courte
+            </label>
 
-          <h2 className="mt-2 text-xl font-extrabold text-brand-brown">
-            Informations du produit
-          </h2>
-
-          <p className="mt-2 text-sm text-brand-brown/50">
-            Ces informations seront affichées sur le site en français.
-          </p>
-        </div>
-
-        <div className="mt-6 space-y-5">
-          <Field
-            label="Nom du produit *"
-            error={errors.translations?.fr?.name?.message}
-            {...register("translations.fr.name")}
-            placeholder="Lampe Lune 3D"
-          />
-
-          <Field
-            label="Description courte"
-            error={errors.translations?.fr?.shortDesc?.message}
-            {...register("translations.fr.shortDesc")}
-            placeholder="Une lampe décorative imprimée en 3D."
-          />
+            <Field
+              label=""
+              error={errors.translations?.fr?.shortDesc?.message}
+              {...register("translations.fr.shortDesc")}
+              placeholder="Une lampe décorative imprimée en 3D."
+            />
+          </div>
 
           <div>
             <label className="mb-2 block text-sm font-bold text-brand-brown">
@@ -248,9 +281,11 @@ type FieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 function Field({ label, error, ...props }: FieldProps) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-bold text-brand-brown">
-        {label}
-      </label>
+      {label && (
+        <label className="mb-2 block text-sm font-bold text-brand-brown">
+          {label}
+        </label>
+      )}
 
       <input
         {...props}

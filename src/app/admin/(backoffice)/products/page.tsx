@@ -4,7 +4,16 @@ import { prisma } from "@/lib/db/prisma";
 import ArchiveProductButton from "@/components/products/ArchiveProductButton";
 import { archiveProductAction } from "./archive-action";
 
-export default async function ProductsPage() {
+type ProductsPageProps = {
+  searchParams: Promise<{
+    success?: string;
+  }>;
+};
+
+export default async function ProductsPage({
+  searchParams,
+}: ProductsPageProps) {
+  const { success } = await searchParams;
   const products = await prisma.product.findMany({
     include: {
       translations: {
@@ -52,6 +61,12 @@ export default async function ProductsPage() {
           Ajouter un produit
         </Link>
       </div>
+
+      {success === "created" && (
+        <div className="mt-6 rounded-xl border border-brand-teal/20 bg-brand-teal/10 px-4 py-3 text-sm font-semibold text-brand-teal">
+          ✓ Produit créé avec succès.
+        </div>
+      )}
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-brand-brown/10 bg-brand-surface">
         {products.length === 0 ? (
